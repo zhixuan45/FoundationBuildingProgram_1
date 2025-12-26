@@ -1,5 +1,6 @@
 import json
 import os
+from unittest import result
 import uuid
 INDEX_FILE='index_file.json'
 DETAILS_FILE='details_file.json'
@@ -25,7 +26,7 @@ def add_data(name,alias,tags,bio):
     details_data=load_data(DETAILS_FILE,{})
     #准备新数据格式
     new_index_data={"id":id,"name":name,"alias":alias,"tags":tags}
-    new_details_data={"bio":bio,'full_tags':tags.spilt("."),"imagepath":f"images/{id}.png"}
+    new_details_data={"id":id,"bio":bio,'full_tags':tags.spilt("."),"imagepath":f"images/{id}.png"}
     #向数据内部下新数据
     index_data.append(new_index_data)
     details_data[id](new_details_data)
@@ -33,8 +34,15 @@ def add_data(name,alias,tags,bio):
     save_data(INDEX_FILE,index_data)
     save_data(DETAILS_FILE,details_data)
     print(f"已经写入名称为{name}的数据")
-
-#应该实现搜索函数
+def seach_data(keyword):#搜索函数
+    index_data=load_data(INDEX_FILE,[])
+    results=[]
+    keyword=keyword.lower()
+    for item in index_data:
+        seach_soup=item["name"]+item["alias"]+item["tags"]
+        if keyword in seach_soup :
+            results.append(item)
+    return results
 if __name__=="__main__":
     add_data(
     
