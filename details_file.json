@@ -6,5 +6,29 @@
             "追马,草地,搞怪"
         ],
         "imagepath": "images/d007e985.png"
+    },
+    "7a728d63": {
+        "bio": "不想写",
+        "full_tags": [
+            "慢性子",
+            "泥地",
+            "拳击"
+        ],
+        "imagepath": "images/7a728d63.png"
+    },
+    "aaf9db2f": {
+        "bio": "不想写",
+        "full_tags": [
+            "病弱",
+            "玻璃"
+        ],
+        "imagepath": "images/aaf9db2f.png"
+    },
+    "a6d0c28c": {
+        "bio": "不想写",
+        "full_tags": [
+            "慵懒"
+        ],
+        "imagepath": "images/a6d0c28c.png"
     }
 }
