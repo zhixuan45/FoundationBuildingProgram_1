@@ -5,25 +5,30 @@
     <title>赛马娘图鉴</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body style="margin: 0; font-family: sans-serif; background-color: #f4f4f9;">
+    <!-- 使用 sticky 让搜索栏固定在最顶端 -->
+    <div id="search-card" style="text-align: center; padding: 20px; background-color: white; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <input type="text" id="searchInput" placeholder="搜索马娘名字或标签..." 
+        style="padding: 10px; width: 300px; border-radius: 8px; border: 1px solid #ccc;">
+    </div>
+    <!-- flex-wrap 允许卡片自动换行 -->
+    <div  id="app" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; padding: 20px;"></div>
 
-    <div class="card">
-        <div class="card-image">
-            <img src="cover.jpg" alt="角色图片">
-        </div>
-        
-        <div class="card-content">
-            <h2>特别周</h2>
-            <h3>Tokai Teio</h3>
-            <div class="tags">
-                <span class="tag tag-grass">草地</span>
-                <span class="tag tag-runner">差行</span>
+    <!-- 添加角色的表单区域，使用了 style.css 中的类名 -->
+    <div class="add-container">
+        <div class="add-card">
+            <h3>✨ 添加新马娘</h3>
+            <div class="form-group">
+                <input type="text" id="newName" placeholder="名字 (如: 黄金船)">
+                <input type="text" id="newAlias" placeholder="别名 (如: 皮皮船, 外星人)">
+                <input type="text" id="newTags" placeholder="标签 (用逗号或点隔开)">
+                <!-- 简介改用 textarea，适合输入长文本 -->
+                <textarea id="newDesc" placeholder="马娘简介..." rows="3"></textarea>
+                <button onclick="addCharacter()" class="submit-btn">确认提交</button>
             </div>
-            <p class="description">
-                来自北海道的淳朴马娘，目标是成为日本第一的赛马娘！
-            </p>
         </div>
     </div>
 
+    <script src="script.js"></script>
 </body>
 </html>

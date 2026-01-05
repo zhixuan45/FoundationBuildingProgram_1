@@ -7,14 +7,13 @@ DETAILS_FILE='details_file.json'
 class JsonDatabase:
     def load_data(self, filename, default_type):
         if not os.path.exists(filename):
-            os.new_file=open(filename,"w",encoding="utf-8")
+            with open(filename, "w", encoding="utf-8") as f:
+                json.dump(default_type, f)
             return default_type
         else: #如果有文件则读入文件
             with open(filename,"r",encoding="utf-8") as f:
                 return json.load(f)
     def save_data(self, filename, data):
-        if not os.path.exists(filename): #如果没有文件则创建
-            os.new_file=open(filename,"w",encoding="utf-8")
         with open(filename,"w",encoding="utf-8") as f:
             json.dump(data,f,ensure_ascii=False,indent=4)
         print(f"数据已经存储至 {filename} ")
@@ -37,7 +36,7 @@ class JsonDatabase:
         self.save_data(INDEX_FILE,index_data)
         self.save_data(DETAILS_FILE,details_data)
         print(f"已经写入名称为{name}的数据")
-    def seach_data(self, keyword):  # 搜索函数
+    def search_data(self, keyword):  # 搜索函数
         """
         参数:
             keyword (str): 要搜索的关键词，函数内部会将其转换为小写进行匹配

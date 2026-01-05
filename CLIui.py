@@ -3,11 +3,11 @@ import jsondatabase
 # 创建数据库实例
 db = jsondatabase.JsonDatabase()
 
-def seach():
+def search():
     user_input = input("请输入搜索关键词: ") 
     
     # === 第一步：链接搜索函数 ===
-    search_results = db.seach_data(user_input)
+    search_results = db.search_data(user_input)
     
     if not search_results:
         print("没找到相关内容。")
@@ -34,7 +34,7 @@ def seach():
             print(f"正在显示【{full_content['name']}】的详细内容...")
             print(f"别名：{full_content.get('alias')}")
             print(f"标签: {full_content.get('tags')}")
-            print(f"详情: {full_content.get('bio1')}") # 假设详情存在 content 字段里
+            print(f"详情: {full_content.get('bio')}") # 假设详情存在 content 字段里
             print(f"图片: {full_content.get('imagepath')}")
             print("-" * 20)
             
@@ -54,7 +54,7 @@ def main():
     while True:
         action = input("请选择操作：1. 搜索 2. 添加 3. 退出 (输入数字): ")
         if action == '1':
-            seach()
+            search()
         elif action == '2':
             add()
         elif action == '3':

@@ -3,16 +3,11 @@ body {
     margin: 0;
     background-color: #f0f2f5;
     font-family: 'Microsoft YaHei', sans-serif; /* 用微软雅黑，看着顺眼点 */
-    
-    /* 下面这三行是 Flex 布局的神奇魔法：让卡片死死地钉在屏幕正中间 */
-    display: flex;
-    justify-content: center; /* 水平居中 */
-    align-items: center;     /* 垂直居中 */
-    height: 100vh;           /* 设定高度为视口高度的100% */
 }
 
 /* 2. 卡片本体：像一张圆角的白色卡片 */
 .card {
+    flex-wrap: wrap;
     width: 300px;               /* 卡片宽度 */
     background-color: white;    /* 背景白 */
     border-radius: 16px;        /* 圆角，看着圆润点 */
@@ -65,4 +60,39 @@ body {
     color: #666;
     font-size: 14px;
     line-height: 1.5; /* 行高大一点，读着不累 */
+}
+
+/* 添加表单的样式 */
+.add-container {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    background-color: #fff;
+    margin-top: 40px;
+}
+.add-card {
+    width: 100%;
+    max-width: 500px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid #eee;
+}
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box; /* 防止padding撑开宽度 */
+}
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
 }
