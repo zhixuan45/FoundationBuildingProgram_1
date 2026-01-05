@@ -1,0 +1,68 @@
+/* 1. 全局设置：把默认的边距去掉，让网页背景变成淡灰色 */
+body {
+    margin: 0;
+    background-color: #f0f2f5;
+    font-family: 'Microsoft YaHei', sans-serif; /* 用微软雅黑，看着顺眼点 */
+    
+    /* 下面这三行是 Flex 布局的神奇魔法：让卡片死死地钉在屏幕正中间 */
+    display: flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center;     /* 垂直居中 */
+    height: 100vh;           /* 设定高度为视口高度的100% */
+}
+
+/* 2. 卡片本体：像一张圆角的白色卡片 */
+.card {
+    width: 300px;               /* 卡片宽度 */
+    background-color: white;    /* 背景白 */
+    border-radius: 16px;        /* 圆角，看着圆润点 */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* 加一点阴影，让它有悬浮感 */
+    overflow: hidden;           /* 这是一个小技巧：防止图片溢出把圆角挡住 */
+    transition: transform 0.3s; /* 这是一个动画预设，为了以后鼠标放上去能动 */
+}
+
+/* 鼠标放上去时，卡片稍微浮起来一点点 */
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* 3. 图片区域 */
+.card-image img {
+    width: 100%;    /* 图片宽度撑满卡片 */
+    height: 200px;  /* 固定高度 */
+    object-fit: cover; /* 这是一个神属性！它能保证图片裁剪居中，不会被压扁或拉长 */
+}
+
+/* 4. 文字内容区域 */
+.card-content {
+    padding: 20px; /* 给文字留点呼吸空间 */
+}
+
+.card-content h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+/* 5. 标签小按钮 */
+.tag {
+    display: inline-block;
+    padding: 4px 8px;
+    margin-right: 5px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: white;
+}
+
+/* 给不同的标签上不同的色 */
+.tag-grass {
+    background-color: #4caf50; /* 绿色代表草地 */
+}
+.tag-runner {
+    background-color: #ff9800; /* 橙色代表脚质 */
+}
+
+.description {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5; /* 行高大一点，读着不累 */
+}
