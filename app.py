@@ -60,6 +60,20 @@ def add_character():
         bio=data['bio']
     )
     return jsonify({"status": "success"})
-
+@app.route('/api/character/<char_id>', methods=['DELETE'])
+def delete_character(char_id):
+    db.del_data(char_id)
+    return jsonify({"status": "deleted"})
+@app.route('/api/character/<char_id>', methods=['PUT'])
+def update_character(char_id):
+    data = request.get_json()
+    db.update_data(
+        char_id,
+        name=data.get('name'),
+        alias=data.get('alias'),
+        tags=data.get('tags'),
+        bio=data.get('bio')
+    )
+    return jsonify({"status": "updated"})
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

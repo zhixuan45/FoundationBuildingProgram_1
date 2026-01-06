@@ -1,4 +1,5 @@
 let allCharacters = [];
+let currentEditId = null; // 用于追踪当前正在编辑的 ID，null 表示处于“新增”模式
 
 /**
  * 1. 加载所有马娘数据
@@ -13,7 +14,8 @@ async function loadCharacters() {
     // response.json() 把后端传回来的原始文本转换成 JavaScript 能操作的“对象数组”
     const data = await response.json();
     
-    console.log("拿到数据啦：", data);
+    // 【修复】将数据存入全局变量，方便编辑时读取原始信息
+    allCharacters = data;
 
     // 拿到数据后，调用渲染函数把它们显示在网页上
     renderCards(data);
@@ -46,13 +48,15 @@ const renderCards = (characterList) => {
             </div>
             <div class="card-content">
                 <h2>${char.name}</h2>
-                <p>${alias = char.alias ? char.alias : ''}</p>
+                <p>${char.alias || ''}</p>
                 <div class="tags">
                     <!-- 标签也是个数组，所以我们再用一次 map 把每个标签变成 <span> -->
                     ${char.tags.map(tag => `<span class="tag tag-grass">${tag}</span>`).join('')}
                 </div>
                 <p class="description">${char.desc}</p>
             </div>
+            <button class="button" onclick="deleteCharacter('${char.id}')">删除</button>
+            <button class="button" onclick="prepareEdit('${char.id}')">编辑</button>
         </div>
     `).join(''); // map 完后是一个数组，用 .join('') 把它们拼成一整个长字符串
 
@@ -92,14 +96,53 @@ const performSearch = async (keyword) => {
 };
 
 /**
- * 5. 事件监听
- * 找到输入框，监听它的 'input' 事件（即用户打字动作）。
- * 使用 debounce 包裹搜索函数，设定 300 毫秒的延迟。
+ * 5. 删除逻辑
  */
+async function deleteCharacter(id) {
+    if (!confirm("确定要删除这位马娘吗？此操作不可撤销。")) return;
+
+    const response = await fetch(`http://127.0.0.1:5000/api/character/${id}`, {
+        method: 'DELETE'
+    });
+
+    const result = await response.json();
+    if (result.status === "deleted") {
+        loadCharacters(); // 刷新列表
+    } else {
+        alert("删除失败");
+    }
+}
+
+/**
+ * 6. 编辑准备逻辑：将数据填回表单
+ */
+function prepareEdit(id) {
+    // 从当前页面数据中找到对应的马娘（或者发请求获取最新数据）
+    // 这里假设我们要编辑的数据已经在页面上了
+    const cards = document.querySelectorAll('.card');
+    // 简单起见，我们直接通过 ID 重新请求或从全局变量找
+    // 建议：在 loadCharacters 时把 data 存入 allCharacters
+    const char = document.querySelector(`button[onclick="prepareEdit('${id}')"]`).closest('.card');
+    
+    document.getElementById('newName').value = char.querySelector('h2').innerText;
+    document.getElementById('newAlias').value = char.querySelector('p').innerText;
+    document.getElementById('newDesc').value = char.querySelector('.description').innerText;
+    document.getElementById('newTags').value = Array.from(char.querySelectorAll('.tag')).map(t => t.innerText).join(', ');
+    // 标签处理略微复杂，建议直接填入原始 tags 字符串
+    
+    currentEditId = id; // 进入编辑模式
+    document.querySelector('button[onclick="saveCharacter()"]').innerText = "保存修改";
+}
+
+/**
 document.getElementById('searchInput').addEventListener('input', debounce((e) => {
     performSearch(e.target.value);
 }, 300));
-async function addCharacter() {
+
+/**
+ * 7. 提交表单（新增或更新）
+ */
+async function saveCharacter() {
     // 1. 收集输入框里的数据
     const name = document.getElementById('newName').value;
     const desc = document.getElementById('newDesc').value;
@@ -122,19 +165,31 @@ async function addCharacter() {
         bio: desc  // 注意：后端接收的字段名是 bio，不是 desc
     };
 
-    // 2. 发送 POST 请求给 Python
-    // 注意：接口地址应为 /api/character (单数)
-    const response = await fetch('http://127.0.0.1:5000/api/character', {
-        method: 'POST', // 告诉服务器我要“发送”数据
+    // 2. 根据是否有 currentEditId 决定是 POST 还是 PUT
+    const url = currentEditId 
+        ? `http://127.0.0.1:5000/api/character/${currentEditId}`
+        : 'http://127.0.0.1:5000/api/character';
+    
+    const method = currentEditId ? 'PUT' : 'POST';
+
+    const response = await fetch(url, {
+        method: method,
         headers: {
-            'Content-Type': 'application/json' // 告诉服务器我发的是JSON
+            'Content-Type': 'application/json'
         },
-        body: JSON.stringify(newChar) // 把JS对象变成字符串发过去
+        body: JSON.stringify(newChar)
     });
 
     const result = await response.json();
-    if (result.status === "success") {
-        alert("添加成功！");
+    if (result.status === "success" || result.status === "updated") {
+        alert(currentEditId ? "修改成功！" : "添加成功！");
+        
+        // 重置状态
+        currentEditId = null;
+        // 【修复】统一使用 saveCharacter 选择器
+        const btn = document.querySelector('button[onclick="saveCharacter()"]');
+        if (btn) btn.innerText = "添加马娘";
+
         // 清空输入框并刷新列表
         document.querySelectorAll('.form-group input, .form-group textarea').forEach(i => i.value = '');
         loadCharacters();
