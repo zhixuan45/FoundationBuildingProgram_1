@@ -17,11 +17,20 @@
         "imagepath": "images/7a728d63.png"
     },
     "aaf9db2f": {
-        "bio": "不想写...",
+        "bio": "不想写......",
         "full_tags": [
             "病弱",
             " 玻璃"
         ],
         "imagepath": "images/aaf9db2f.png"
+    },
+    "52954065": {
+        "bio": "不想写",
+        "full_tags": [
+            "可爱",
+            "运气差",
+            "流鼻血"
+        ],
+        "imagepath": "images/52954065.png"
     }
 }
