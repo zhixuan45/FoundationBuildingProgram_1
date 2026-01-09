@@ -82,15 +82,25 @@ public class JsonDatabase {
         }
     }
 
+    /**
+     * 从文件中加载DetailsEntry映射数据
+     * 该方法读取DETAILS_FILE指定的文件，将其解析为Map<String, DetailsEntry>格式返回
+     * 如果文件不存在或解析失败，则返回一个新的空HashMap
+     *
+     * @return 包含DetailsEntry对象的Map，键为String类型，值为DetailsEntry类型
+     *         如果文件不存在或解析出错，则返回空的HashMap
+     */
     private Map<String, DetailsEntry> loadDetails() {
         File file = new File(DETAILS_FILE);
         if (!file.exists()) return new HashMap<>();
 
         try (Reader reader = new FileReader(file)) {
             Type mapType = new TypeToken<HashMap<String, DetailsEntry>>(){}.getType();
+            // 从JSON文件中反序列化出Map数据
             Map<String, DetailsEntry> data = gson.fromJson(reader, mapType);
             return data != null ? data : new HashMap<>();
         } catch (IOException e) {
+            // 如果发生IO异常，返回空的HashMap
             return new HashMap<>();
         }
     }
