@@ -16,7 +16,10 @@ public class app {
     private final JsonDatabase db = new JsonDatabase();
 
     public static void main(String[] args) {
-        SpringApplication.run(app.class, args);
+        SpringApplication application = new SpringApplication(app.class);
+        // 将端口设置为 5000，以匹配你之前的 Python 后端和前端配置
+        application.setDefaultProperties(Collections.singletonMap("server.port", "5000"));
+        application.run(args);
     }
 
     /**
@@ -52,6 +55,7 @@ public class app {
     @GetMapping("/characters")
     public List<Map<String, Object>> getCharacters() {
         // 使用 searchData("") 获取所有数据
+        System.out.println("收到请求：获取所有角色列表");
         return db.searchData("").stream()
                 .map(item -> formatCharacter(item, true))
                 .collect(Collectors.toList());
@@ -69,6 +73,7 @@ public class app {
     // 3. 添加角色 (POST /api/character)
     @PostMapping("/character")
     public Map<String, String> addCharacter(@RequestBody Map<String, String> data) {
+        System.out.println("收到请求：添加角色 " + data.get("name"));
         db.addData(
             data.get("name"),
             data.get("alias"),

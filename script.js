@@ -143,12 +143,14 @@ document.getElementById('searchInput').addEventListener('input', debounce((e) =>
  * 7. 提交表单（新增或更新）
  */
 async function saveCharacter() {
-    // 1. 收集输入框里的数据
+    // 1. 集输入框里的数据
     const name = document.getElementById('newName').value;
     const desc = document.getElementById('newDesc').value;
     const alias = document.getElementById('newAlias').value;
     const tagsRaw = document.getElementById('newTags').value;
 
+    // 验证必要字段是否为空
+    // 如果名称或描述为空，则显示警告并退出函数
     if (!name || !desc) {
         alert("名字和简介不能为空哦！");
         return;
@@ -156,7 +158,7 @@ async function saveCharacter() {
 
     // 后端 jsondatabase.py 期望 tags 是用 "." 分隔的字符串
     // 我们把用户输入的逗号统一换成点
-    const formattedTags = tagsRaw.replace(/[,，]/g, '.');
+    const formattedTags = tagsRaw.replace(/[,，、]/g, '.');
 
     const newChar = {
         name: name,

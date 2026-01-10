@@ -27,6 +27,31 @@ public class JsonDatabase {
                 .setPrettyPrinting() // 启用缩进输出，让 JSON 更好看
                 .disableHtmlEscaping() // 防止特殊字符（如 < >）被转义
                 .create();
+        
+        // 初始化检查：确保文件存在
+        initializeFiles();
+    }
+
+    /**
+     * 检查并初始化 JSON 文件
+     */
+    private void initializeFiles() {
+        ensureFileExists(INDEX_FILE, new ArrayList<IndexEntry>());
+        ensureFileExists(DETAILS_FILE, new HashMap<String, DetailsEntry>());
+    }
+
+    private void ensureFileExists(String fileName, Object defaultContent) {
+        File file = new File(fileName);
+        if (!file.exists()) {
+            System.out.println("检测到文件缺失，正在创建默认文件: " + file.getAbsolutePath());
+            try (Writer writer = new FileWriter(file)) {
+                gson.toJson(defaultContent, writer);
+            } catch (IOException e) {
+                System.err.println("无法创建初始化文件 " + fileName + ": " + e.getMessage());
+            }
+        } else {
+            System.out.println("已加载数据库文件: " + file.getAbsolutePath());
+        }
     }
 
     // --- 数据模型 (POJO) ---
@@ -70,7 +95,10 @@ public class JsonDatabase {
     // 从文件加载索引列表
     private List<IndexEntry> loadIndex() {
         File file = new File(INDEX_FILE);
-        if (!file.exists()) return new ArrayList<>();
+        if (!file.exists()) {
+            // 如果 initializeFiles 正常工作，这里理论上不会触发
+            return new ArrayList<>();
+        }
 
         try (Reader reader = new FileReader(file)) {
             // Gson 使用 TypeToken 来处理泛型（如 List<IndexEntry>）
