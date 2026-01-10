@@ -1,7 +1,7 @@
+import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from jsondatabase import JsonDatabase
-from flask import request
 app = Flask(__name__)
 CORS(app)  # 允许跨域请求，方便前端调用
 db = JsonDatabase()
@@ -50,30 +50,78 @@ def search():
             "desc": info.get('bio', '暂无描述')
         })
     return jsonify(formatted_data)
-@app.route('/api/character', methods=['post'])
+@app.route('/api/character', methods=['POST'])
 def add_character():
-    data = request.get_json()
-    db.add_data(
-        name=data['name'],
-        alias=data['alias'],
-        tags=data['tags'],
-        bio=data['bio']
+    # 检查请求类型，支持 JSON 或 multipart/form-data (带图片上传)
+    if request.is_json:
+        data = request.get_json()
+        name = data.get('name')
+        alias = data.get('alias')
+        tags = data.get('tags')
+        bio = data.get('bio')
+        image_file = None
+    else:
+        name = request.form.get('name')
+        alias = request.form.get('alias')
+        tags = request.form.get('tags')
+        bio = request.form.get('bio')
+        image_file = request.files.get('image')
+
+    new_id = db.add_data(
+        name=name,
+        alias=alias,
+        tags=tags,
+        bio=bio
     )
-    return jsonify({"status": "success"})
+
+    # 如果有图片上传，保存图片
+    if image_file and new_id:
+        # 确保 images 目录存在
+        if not os.path.exists('images'):
+            os.makedirs('images')
+        
+        # 保存图片，文件名与 ID 关联 (数据库中硬编码了 images/{id}.png)
+        # 注意：这里强制保存为 png 后缀以匹配数据库逻辑
+        image_path = os.path.join('images', f"{new_id}.png")
+        image_file.save(image_path)
+
+    return jsonify({"status": "success", "id": new_id})
 @app.route('/api/character/<char_id>', methods=['DELETE'])
 def delete_character(char_id):
     db.del_data(char_id)
     return jsonify({"status": "deleted"})
 @app.route('/api/character/<char_id>', methods=['PUT'])
 def update_character(char_id):
-    data = request.get_json()
+    # 1. 检查请求类型，支持 JSON 或 multipart/form-data (带图片上传)
+    if request.is_json:
+        data = request.get_json()
+        name = data.get('name')
+        alias = data.get('alias')
+        tags = data.get('tags')
+        bio = data.get('bio')
+        image_file = None
+    else:
+        name = request.form.get('name')
+        alias = request.form.get('alias')
+        tags = request.form.get('tags')
+        bio = request.form.get('bio')
+        image_file = request.files.get('image')
+
     db.update_data(
         char_id,
-        name=data.get('name'),
-        alias=data.get('alias'),
-        tags=data.get('tags'),
-        bio=data.get('bio')
+        name=name,
+        alias=alias,
+        tags=tags,
+        bio=bio
     )
+
+    # 2. 如果上传了新图片，则覆盖旧图片
+    if image_file:
+        if not os.path.exists('images'):
+            os.makedirs('images')
+        image_path = os.path.join('images', f"{char_id}.png")
+        image_file.save(image_path)
+
     return jsonify({"status": "updated"})
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

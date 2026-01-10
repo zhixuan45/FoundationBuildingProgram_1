@@ -148,6 +148,7 @@ async function saveCharacter() {
     const desc = document.getElementById('newDesc').value;
     const alias = document.getElementById('newAlias').value;
     const tagsRaw = document.getElementById('newTags').value;
+    const imageInput = document.getElementById('newImage'); // 获取文件输入框
 
     // 验证必要字段是否为空
     // 如果名称或描述为空，则显示警告并退出函数
@@ -160,12 +161,17 @@ async function saveCharacter() {
     // 我们把用户输入的逗号统一换成点
     const formattedTags = tagsRaw.replace(/[,，、]/g, '.');
 
-    const newChar = {
-        name: name,
-        alias: alias,
-        tags: formattedTags,
-        bio: desc  // 注意：后端接收的字段名是 bio，不是 desc
-    };
+    // 使用 FormData 替代 JSON，以便支持文件上传
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('alias', alias);
+    formData.append('tags', formattedTags);
+    formData.append('bio', desc);
+
+    // 如果用户选择了文件，才添加到 formData 中
+    if (imageInput.files[0]) {
+        formData.append('image', imageInput.files[0]);
+    }
 
     // 2. 根据是否有 currentEditId 决定是 POST 还是 PUT
     const url = currentEditId 
@@ -176,10 +182,9 @@ async function saveCharacter() {
 
     const response = await fetch(url, {
         method: method,
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newChar)
+        // 注意：使用 FormData 时，不要手动设置 Content-Type
+        // 浏览器会自动识别并设置为 multipart/form-data
+        body: formData
     });
 
     const result = await response.json();
@@ -194,9 +199,10 @@ async function saveCharacter() {
 
         // 清空输入框并刷新列表
         document.querySelectorAll('.form-group input, .form-group textarea').forEach(i => i.value = '');
+        imageInput.value = ''; // 额外清空文件选择框
         loadCharacters();
     } else {
-        alert("添加失败，请检查后端日志");
+        alert("操作失败，请检查后端日志");
     }
 }
 // 6. 页面一打开，先执行一次加载，把初始数据展示出来

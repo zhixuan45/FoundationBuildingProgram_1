@@ -37,6 +37,7 @@ class JsonDatabase:
         self.save_data(INDEX_FILE,index_data)
         self.save_data(DETAILS_FILE,details_data)
         print(f"已经写入名称为{name}的数据")
+        return id
     def search_data(self, keyword):  # 搜索函数
         """
         参数:
@@ -142,7 +143,7 @@ class JsonDatabase:
             self.save_data(INDEX_FILE, index_data)
             self.save_data(DETAILS_FILE, details_data)
             print(f"成功更新 ID 为 {update_id} 的数据")
-            return True
+            return update_id
         else:
             print(f"未找到 ID 为 {update_id} 的数据，更新失败")
             return False
