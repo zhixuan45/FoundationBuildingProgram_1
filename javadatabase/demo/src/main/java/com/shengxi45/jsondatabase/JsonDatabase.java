@@ -148,26 +148,26 @@ public class JsonDatabase {
     }
 
     // 添加新数据
-    public void addData(String name, String alias, String tags, String bio) {
+    public String addData(String name, String alias, String tags, String bio) {
         // 1. 先把旧数据读出来
         List<IndexEntry> indexData = loadIndex();
         Map<String, DetailsEntry> detailsData = loadDetails();
 
         // 2. 生成唯一 ID (取 UUID 的前8位)
-        String id = UUID.randomUUID().toString().substring(0, 8);
+        String data_id = UUID.randomUUID().toString().substring(0, 8);
         
         // 3. 创建新的对象
-        IndexEntry newIndex = new IndexEntry(id, name, alias, tags);
+        IndexEntry newIndex = new IndexEntry(data_id, name, alias, tags);
         // 将 "术士.近卫" 这种字符串按点分割成列表
         List<String> fullTags = Arrays.asList(tags.split("\\."));
-        DetailsEntry newDetails = new DetailsEntry(bio, fullTags, "images/" + id + ".png");
+        DetailsEntry newDetails = new DetailsEntry(bio, fullTags, "images/" + data_id + ".png");
 
         // 4. 存入集合
         indexData.add(newIndex);
-        detailsData.put(id, newDetails);
-
+        detailsData.put(data_id, newDetails);
         saveFiles(indexData, detailsData);
         System.out.println("已经写入名称为 " + name + " 的数据");
+        return data_id; // 返回生成的 ID
     }
 
     // 搜索数据

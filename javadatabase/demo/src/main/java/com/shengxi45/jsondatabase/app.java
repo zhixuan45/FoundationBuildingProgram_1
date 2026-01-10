@@ -3,6 +3,9 @@ package com.shengxi45.jsondatabase;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.File;
+import java.io.IOException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -71,16 +74,28 @@ public class app {
     }
 
     // 3. 添加角色 (POST /api/character)
+    // 修改为接收 MultipartFile 和 @RequestParam，以支持图片上传
     @PostMapping("/character")
-    public Map<String, String> addCharacter(@RequestBody Map<String, String> data) {
-        System.out.println("收到请求：添加角色 " + data.get("name"));
-        db.addData(
-            data.get("name"),
-            data.get("alias"),
-            data.get("tags"),
-            data.get("bio")
-        );
-        return Collections.singletonMap("status", "success");
+    public Map<String, Object> addCharacter(
+            @RequestParam("name") String name,
+            @RequestParam("alias") String alias,
+            @RequestParam("tags") String tags,
+            @RequestParam("bio") String bio,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile
+    ) {
+        System.out.println("收到请求：添加角色 " + name);
+        // 调用数据库添加数据，并获取返回的 ID
+        String newId = db.addData(name, alias, tags, bio);
+
+        // 如果有图片，保存图片
+        if (imageFile != null && !imageFile.isEmpty()) {
+            saveImageFile(newId, imageFile);
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("id", newId);
+        return response;
     }
 
     // 4. 删除角色 (DELETE /api/character/{char_id})
@@ -92,15 +107,36 @@ public class app {
 
     // 5. 更新角色 (PUT /api/character/{char_id})
     @PutMapping("/character/{char_id}")
-    public Map<String, String> updateCharacter(@PathVariable("char_id") String charId, 
-                                              @RequestBody Map<String, String> data) {
-        db.updateData(
-            charId,
-            data.get("name"),
-            data.get("alias"),
-            data.get("tags"),
-            data.get("bio")
-        );
+    public Map<String, String> updateCharacter(
+            @PathVariable("char_id") String charId,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "alias", required = false) String alias,
+            @RequestParam(value = "tags", required = false) String tags,
+            @RequestParam(value = "bio", required = false) String bio,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile
+    ) {
+        db.updateData(charId, name, alias, tags, bio);
+
+        // 如果上传了新图片，覆盖旧图片
+        if (imageFile != null && !imageFile.isEmpty()) {
+            saveImageFile(charId, imageFile);
+        }
+
         return Collections.singletonMap("status", "updated");
+    }
+
+    // 辅助方法：保存图片
+    private void saveImageFile(String id, MultipartFile file) {
+        try {
+            // 确保 images 目录存在 (相当于 Python 的 os.makedirs)
+            File dir = new File("images");
+            if (!dir.exists()) dir.mkdirs();
+            
+            // 保存文件，强制命名为 {id}.png
+            File dest = new File(dir, id + ".png");
+            file.transferTo(dest); // 这一步相当于 Python 的 file.save()
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
