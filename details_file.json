@@ -1,10 +1,36 @@
 {
-  "9c35e186": {
-    "bio": "罗德岛公开领袖",
-    "full_tags": [
-      "术士",
-      "近卫"
-    ],
-    "imagepath": "images/9c35e186.png"
-  }
+    "d007e985": {
+        "id": "d007e985",
+        "bio": "总是做出不可预测行为的赛马娘...",
+        "full_tags": [
+            "追马,草地,搞怪"
+        ],
+        "imagepath": "images/d007e985.png"
+    },
+    "7a728d63": {
+        "bio": "不想写",
+        "full_tags": [
+            "慢性子",
+            "泥地",
+            "拳击"
+        ],
+        "imagepath": "images/7a728d63.png"
+    },
+    "aaf9db2f": {
+        "bio": "不想写......",
+        "full_tags": [
+            "病弱",
+            " 玻璃"
+        ],
+        "imagepath": "images/aaf9db2f.png"
+    },
+    "52954065": {
+        "bio": "不想写",
+        "full_tags": [
+            "可爱",
+            "运气差",
+            "流鼻血"
+        ],
+        "imagepath": "images/52954065.png"
+    }
 }
