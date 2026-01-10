@@ -24,8 +24,9 @@ body {
 /* 3. 图片区域 */
 .card-image img {
     width: 100%;    /* 图片宽度撑满卡片 */
-    height: 200px;  /* 固定高度 */
+    height: 350px;  /* 固定高度 */
     object-fit: cover; /* 这是一个神属性！它能保证图片裁剪居中，不会被压扁或拉长 */
+    object-position: top; /* 让图片对齐顶部，这样能看清角色的脸 */
 }
 
 /* 4. 文字内容区域 */
@@ -107,4 +108,71 @@ body {
     border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
+}
+/* --- 弹窗样式 --- */
+.modal {
+    display: none; /* 默认隐藏 */
+    position: fixed; 
+    z-index: 2000; /* 保证在最上层 */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5); /* 半透明黑色背景 */
+    backdrop-filter: blur(5px); /* 背景模糊效果 */
+}
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto; /* 距顶部 5% */
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px; /* 限制最大宽度 */
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: slideDown 0.3s ease-out;
+}
+@keyframes slideDown {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close-btn:hover { color: #333; }
+
+/* --- 悬浮添加按钮 (FAB) --- */
+.fab-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: #ff6b81;
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 60px;
+    font-size: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 1001;
+    transition: transform 0.2s;
+}
+.fab-btn:hover { transform: scale(1.1); background-color: #ff4757; }
+
+/* 详情弹窗图片样式 */
+#detailImage { 
+    display: block;
+    width: auto;          /* 宽度自动，防止拉伸 */
+    max-width: 100%;      /* 宽度不超过容器 */
+    max-height: 60vh;     /* 高度不超过视口高度的 60% */
+    object-fit: contain;  /* 保持比例 */
+    border-radius: 8px; 
+    margin: 0 auto 15px auto; /* 图片居中 */
 }

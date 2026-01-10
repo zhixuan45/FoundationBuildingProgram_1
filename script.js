@@ -41,8 +41,10 @@ const renderCards = (characterList) => {
     // .map() 是 JS 的神技：它遍历数组里的每一个马娘对象(char)，
     // 并根据模板生成一段 HTML 字符串。
     // `${char.name}` 这种写法叫“模板字符串”，可以直接把变量塞进字符串里。
+    // 【修改】给 card 添加 onclick 事件，点击整个卡片打开详情
+    // 【修改】给 button 添加 event.stopPropagation()，防止点击按钮时也触发卡片点击
     const cardsHTML = characterList.map(char => `
-        <div class="card">
+        <div class="card" onclick="openDetailModal('${char.id}')" style="cursor: pointer;">
             <div class="card-image">
                 <img src="${char.image}" alt="${char.name}">
             </div>
@@ -53,10 +55,11 @@ const renderCards = (characterList) => {
                     <!-- 标签也是个数组，所以我们再用一次 map 把每个标签变成 <span> -->
                     ${char.tags.map(tag => `<span class="tag tag-grass">${tag}</span>`).join('')}
                 </div>
-                <p class="description">${char.desc}</p>
+                <!-- CSS 中建议限制行数，这里只显示一部分 -->
+                <p class="description" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${char.desc}</p>
             </div>
-            <button class="button" onclick="deleteCharacter('${char.id}')">删除</button>
-            <button class="button" onclick="prepareEdit('${char.id}')">编辑</button>
+            <button class="button" onclick="event.stopPropagation(); deleteCharacter('${char.id}')">删除</button>
+            <button class="button" onclick="event.stopPropagation(); prepareEdit('${char.id}')">编辑</button>
         </div>
     `).join(''); // map 完后是一个数组，用 .join('') 把它们拼成一整个长字符串
 
@@ -114,24 +117,76 @@ async function deleteCharacter(id) {
 }
 
 /**
+ * --- 弹窗控制逻辑 ---
+ */
+
+// 打开表单弹窗（新增模式）
+function openFormModal() {
+    // 如果不是编辑模式（即点击了加号按钮），清空表单
+    if (!currentEditId) {
+        document.querySelectorAll('.form-group input, .form-group textarea').forEach(i => i.value = '');
+        document.getElementById('formTitle').innerText = "✨ 添加新马娘";
+        document.querySelector('button[onclick="saveCharacter()"]').innerText = "确认提交";
+    }
+    document.getElementById('formModal').style.display = 'block';
+}
+
+// 关闭表单弹窗
+function closeFormModal() {
+    document.getElementById('formModal').style.display = 'none';
+    currentEditId = null; // 重置编辑状态
+}
+
+// 打开详情弹窗
+function openDetailModal(id) {
+    const char = allCharacters.find(c => c.id === id);
+    if (!char) return;
+
+    const content = document.getElementById('detailContent');
+    content.innerHTML = `
+        <img id="detailImage" src="${char.image}" alt="${char.name}">
+        <h2>${char.name}</h2>
+        <p style="color: #666;">${char.alias || ''}</p>
+        <div class="tags" style="margin: 10px 0;">
+            ${char.tags.map(tag => `<span class="tag tag-grass">${tag}</span>`).join('')}
+        </div>
+        <p style="line-height: 1.6; white-space: pre-wrap;">${char.desc}</p>
+    `;
+    document.getElementById('detailModal').style.display = 'block';
+}
+
+// 关闭详情弹窗
+function closeDetailModal() {
+    document.getElementById('detailModal').style.display = 'none';
+}
+
+// 点击弹窗外部区域关闭弹窗
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = "none";
+        if (event.target.id === 'formModal') currentEditId = null;
+    }
+}
+
+/**
  * 6. 编辑准备逻辑：将数据填回表单
  */
 function prepareEdit(id) {
-    // 从当前页面数据中找到对应的马娘（或者发请求获取最新数据）
-    // 这里假设我们要编辑的数据已经在页面上了
-    const cards = document.querySelectorAll('.card');
-    // 简单起见，我们直接通过 ID 重新请求或从全局变量找
-    // 建议：在 loadCharacters 时把 data 存入 allCharacters
-    const char = document.querySelector(`button[onclick="prepareEdit('${id}')"]`).closest('.card');
+    // 从全局数据中查找，确保获取到完整的简介（而不是卡片上被截断的）
+    const char = allCharacters.find(c => c.id === id);
+    if (!char) return;
     
-    document.getElementById('newName').value = char.querySelector('h2').innerText;
-    document.getElementById('newAlias').value = char.querySelector('p').innerText;
-    document.getElementById('newDesc').value = char.querySelector('.description').innerText;
-    document.getElementById('newTags').value = Array.from(char.querySelectorAll('.tag')).map(t => t.innerText).join(', ');
-    // 标签处理略微复杂，建议直接填入原始 tags 字符串
+    document.getElementById('newName').value = char.name;
+    document.getElementById('newAlias').value = char.alias;
+    document.getElementById('newDesc').value = char.desc;
+    document.getElementById('newTags').value = char.tags.join('.'); // 数组转回字符串
     
     currentEditId = id; // 进入编辑模式
+    document.getElementById('formTitle').innerText = "📝 编辑马娘";
     document.querySelector('button[onclick="saveCharacter()"]').innerText = "保存修改";
+    
+    // 打开弹窗
+    document.getElementById('formModal').style.display = 'block';
 }
 
 /**
@@ -192,12 +247,9 @@ async function saveCharacter() {
         alert(currentEditId ? "修改成功！" : "添加成功！");
         
         // 重置状态
-        currentEditId = null;
-        // 【修复】统一使用 saveCharacter 选择器
-        const btn = document.querySelector('button[onclick="saveCharacter()"]');
-        if (btn) btn.innerText = "添加马娘";
-
-        // 清空输入框并刷新列表
+        closeFormModal(); // 关闭弹窗
+        
+        // 清空输入框
         document.querySelectorAll('.form-group input, .form-group textarea').forEach(i => i.value = '');
         imageInput.value = ''; // 额外清空文件选择框
         loadCharacters();

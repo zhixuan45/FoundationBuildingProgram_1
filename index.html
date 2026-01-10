@@ -14,18 +14,31 @@
     <!-- flex-wrap 允许卡片自动换行 -->
     <div  id="app" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; padding: 20px;"></div>
 
-    <!-- 添加角色的表单区域，使用了 style.css 中的类名 -->
-    <div class="add-container">
-        <div class="add-card">
-            <h3>✨ 添加新马娘</h3>
+    <!-- 悬浮添加按钮 -->
+    <div class="fab-btn" onclick="openFormModal()">+</div>
+
+    <!-- 1. 表单弹窗 (新增/编辑) -->
+    <div id="formModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeFormModal()">&times;</span>
+            <h3 id="formTitle">✨ 添加新马娘</h3>
             <div class="form-group">
                 <input type="text" id="newName" placeholder="名字 (如: 黄金船)">
                 <input type="text" id="newAlias" placeholder="别名 (如: 皮皮船, 外星人)">
                 <input type="text" id="newTags" placeholder="标签 (用逗号或点隔开)">
-                <!-- 简介改用 textarea，适合输入长文本 -->
                 <textarea id="newDesc" placeholder="马娘简介..." rows="3"></textarea>
                 <input type="file" id="newImage" accept="image/*" style="margin-top: 10px; display: block;">
                 <button onclick="saveCharacter()" class="saveCharater">确认提交</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 详情弹窗 (查看大图和详细介绍) -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeDetailModal()">&times;</span>
+            <div id="detailContent">
+                <!-- JS 会把内容填到这里 -->
             </div>
         </div>
     </div>

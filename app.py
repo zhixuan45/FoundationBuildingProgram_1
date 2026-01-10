@@ -25,7 +25,7 @@ def get_characters():
             "image": info.get('imagepath', ''),
             # 兼容处理：如果 full_tags 不存在，则尝试切割 tags 字符串
             "tags": info.get('full_tags') or item.get('tags', '').replace('.', ',').split(','),
-            "desc": info.get('bio', '暂无描述')[:50] + "..."  # 截取前50字符作为简介
+            "desc": info.get('bio', '暂无描述')
         })
     return jsonify(formatted_data)
 

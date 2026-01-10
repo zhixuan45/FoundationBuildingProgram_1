@@ -46,9 +46,6 @@ public class app {
         
         // 简介处理
         String bio = (fullInfo != null && fullInfo.get("bio") != null) ? (String) fullInfo.get("bio") : "暂无描述";
-        if (truncateBio && bio.length() > 50) {
-            bio = bio.substring(0, 50) + "...";
-        }
         formatted.put("desc", bio);
         
         return formatted;
@@ -134,7 +131,8 @@ public class app {
             
             // 保存文件，强制命名为 {id}.png
             File dest = new File(dir, id + ".png");
-            file.transferTo(dest); // 这一步相当于 Python 的 file.save()
+            // 【修复】使用 getAbsoluteFile() 获取绝对路径，防止因相对路径导致的"找不到指定路径"错误
+            file.transferTo(dest.getAbsoluteFile()); 
         } catch (IOException e) {
             e.printStackTrace();
         }

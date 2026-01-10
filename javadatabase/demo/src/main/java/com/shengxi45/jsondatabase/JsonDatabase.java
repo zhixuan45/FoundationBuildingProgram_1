@@ -38,6 +38,7 @@ public class JsonDatabase {
     private void initializeFiles() {
         ensureFileExists(INDEX_FILE, new ArrayList<IndexEntry>());
         ensureFileExists(DETAILS_FILE, new HashMap<String, DetailsEntry>());
+        
     }
 
     private void ensureFileExists(String fileName, Object defaultContent) {
